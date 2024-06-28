@@ -3,30 +3,26 @@ import BlogList from './BlogList';
 
 const Home = () => {
 
-    const [blogs, setBlogs] = useState([
-        { title: 'My new website', body: 'lorem ipsum...', author: 'mario', id: 1 },
-        { title: 'Welcome party!', body: 'lorem ipsum...', author: 'yoshi', id: 2 },
-        { title: 'Web dev top tips', body: 'lorem ipsum...', author: 'mario', id: 3 }
-    ]);
-
-    const handleDelete =(id) =>{
-        const newBlogs = blogs.filter(blog => blog.id !== id);
-        setBlogs(newBlogs);
-    }
-
-    const [name, setName] = useState('mario');
+    const [blogs, setBlogs] = useState(null);
+    const [isPending, setIsPending] = useState(true); 
 
     useEffect(() => {
-        console.log('use effect ran')
-        console.log(name)
-    },[name]);
+        setTimeout(() => { //This is for debugging purposes only
+            fetch('http://localhost:8000/blogs')
+                .then(res => {
+                    return res.json();
+                })
+                .then((data => {
+                    setBlogs(data);
+                    setIsPending(false);
+                }));
+        }, 1000);
+    },[]); // empty dependency array
 
     return (
         <div className="home">
-            <BlogList blogs={blogs} title="All Blogs" handleDelete={handleDelete}/>
-            <button onClick={()=>setName('luigi')}>Change name</button>
-            <p>{name}</p>
-            
+            {isPending && <div> Loading....</div>}
+            {blogs && <BlogList blogs={blogs} title="All Blogs"/> /* conditional templating in react */} 
         </div>
       );
 }
